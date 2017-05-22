@@ -35,14 +35,14 @@ class Eventlist
 	
 	def create_TRANSDATA(time0, data_id, sensor_id,data_size, station_id)
 		# Creating Events
-		info = [time0, data_id, sensor_id, data_size, station_id]
+		info = [data_id, data_size, sensor_id, station_id]
 		event = [time0, "TRANSDATA", info] # [TIME, EVENT_TYPE, INFORMATION]
 		@events.push(event)
 	end
   
 	def create_RECVDATA(time1, data_id, sensor_id, data_size,station_id)
 		# Creating Events
-		info = [time1, data_id, sensor_id, data_size, station_id]
+		info = [data_id, data_size, sensor_id, station_id]
 		event = [time1, "RECVDATA", info] # [TIME, EVENT_TYPE, INFORMATION]
 		@events.push(event)
 	end
@@ -56,7 +56,6 @@ class Eventlist
   		@events.push(event)
   	end
   
-  
   def create_BUSDEPART(time,bus_id,stati_id)# defining   bus movement model with parameterlist
     # Creating Events
   	info = [bus_id,stati_id]
@@ -64,9 +63,9 @@ class Eventlist
   	@events.push(event)
   end 
   
-  def create_BUSSTOP(time,bus_id,statio_id)# defining   bus movement model with parameterlist
+  def create_BUSSTOP(time,bus_id,statio_id,stoptime) # defining   bus movement model with parameterlist
     # Creating Events
-  	info = [bus_id,statio_id]
+  	info = [bus_id,statio_id, stoptime]
   	event = [time,"BUSSTOP", info] # [TIME, EVENT_TYPE, INFORMATION]
   	@events.push(event)
   end 
@@ -75,7 +74,7 @@ class Eventlist
   
 	def create_TRANSDATASTATION(time0, data_id,bus_id,data_size, station_id)
 		# Creating Events
-		info = [time0, data_id,bus_id, data_size, station_id]
+		info = [data_id,bus_id, data_size, station_id]
 		event = [time0, "TRANSDATASTATION", info] # [TIME, EVENT_TYPE, INFORMATION]
 		@events.push(event)
 	end
@@ -216,11 +215,11 @@ eventlist.events.each do |event|
 	# [time, "TRANSDATA", [Data-ID, Data-originate-sensor-ID, size, Received ID]]
 	# Creating Events
   #time0=time
-	time0 = event[0]# time generated during the data generation 
+	time0 = event[0]+0.1 # time generated during the data generation 
 	eventlist.create_TRANSDATA(time0, data_id, sensor_id, data_size, station_id)
 
-	time1 = time0+1
-	eventlist.create_RECVDATA(time1, data_id, sensor_id, data_size, station_id)
+#	time1 = time0+1
+#	eventlist.create_RECVDATA(time1, data_id, sensor_id, data_size, station_id)
   end
 
 end
@@ -262,30 +261,30 @@ bus2 = Bus.new("bus-002")
 #p list_stations
 
 
-bus1.move("station-001", "station-002",60)# station_id 
-bus1.stop("station-002",30)# station_id
+bus1.move("station-001", "station-002",60*60)# station_id 
+bus1.stop("station-002",30*60)# station_id
 
-bus1.move("station-002", "station-003",60)# station_id 
-bus1.stop("station-003",30)# station_id
+bus1.move("station-002", "station-003",60*60)# station_id 
+bus1.stop("station-003",30*60)# station_id
 
-bus1.move("station-003", "station-004",60)# station_id 
-bus1.stop("station-004",30)# station_id
+bus1.move("station-003", "station-004",60*60)# station_id 
+bus1.stop("station-004",30*60)# station_id
 
-bus1.move("station-004", "station-001",60)# station_id 
-bus1.stop("station-001",30)# station_id
+bus1.move("station-004", "station-001",60*60)# station_id 
+bus1.stop("station-001",30*60)# station_id
 
 
-bus2.move("station-003","station-004",60)#
-bus2.stop("station-004",30)
+bus2.move("station-003","station-004",60*60)#
+bus2.stop("station-004",30*60)
 
-bus2.move("station-004","station-001",60)#
-bus2.stop("station-001",30)
+bus2.move("station-004","station-001",60*60)#
+bus2.stop("station-001",30*60)
 
-bus2.move("station-001","station-002",60)#
-bus2.stop("station-002",30)
+bus2.move("station-001","station-002",60*60)#
+bus2.stop("station-002",30*60)
 
-bus2.move("station-002","station-003",60)#
-bus2.stop("station-003",30)
+bus2.move("station-002","station-003",60*60)#
+bus2.stop("station-003",30*60)
 
 #list_buses=[bus1,bus2]
 
@@ -303,7 +302,7 @@ eventlist.sort()
   current=0
   bus_path.each do |path|
     if (path[0]=='STOP') then
-    	eventlist.create_BUSSTOP(current, path[1], path[2])
+    	eventlist.create_BUSSTOP(current, path[1], path[2], path[3])
         current=path[3]+current
     end
    
@@ -319,105 +318,13 @@ eventlist.sort()
   end 
    
   
-  
     # Data transmission Event from station To bus within specific data size 
     
     
-    
+
 eventlist.sort()
 eventlist.events.each do |event|
-  [bus1_path, bus2_path].each do |bus_path|
-    bus_path.each do |path|   
-      if path[0] =='MOVE' 
-        #bus_id = event[2][0]
-        #p bus_id
-        #station_id1=event[2][1]
-        #p station_id
-    
-       if  event[1]=='GENDATA' 
-         data_id =event[2][0]
-         #p data_id
-         data_size=event[2][2]
-         #p  data_size
-  
-        time0 = event[0]# time generated during the data generation 
-        eventlist.create_TRANSDATASTATION(time0,path[1],path[2],data_id,data_size)
-
-        time1 = time0+1
-        eventlist.create_RECVDATABUS(time1,path[1],path[2],data_id,data_size)
-   end 
- end
-end 
-end
-end
-#end 
- 
-
-
-  #end
-
-     
-eventlist.sort()
-eventlist.events.each do |event|
- #p event
-
-  #p event
-  #for i in 0..(SIMULATION_DURATION) do
-  
-
-  if (event[1] == "GENDATA") then
-    printf"#{event[0]},#{event[1]},#{event[2][0]},#{event[2][1]},#{event[2][2]},#{event[2][3]}\n"
-  end
-  if (event[1] == "TRANSDATA") then
-    printf"#{event[2][0]},#{event[1]},#{event[2][1]},#{event[2][2]},#{event[2][3]},#{event[2][4]}\n"
-  end
-  if (event[1] == "RECVDATA") then
-    printf"#{event[2][0]},#{event[1]},#{event[2][1]},#{event[2][2]},#{event[2][3]},#{event[2][4]}\n"
-  end
-
-  
-  if (event[1] == "BUSARRIVAL") then
-    printf"#{event[0]},#{event[1]},#{event[2][0]},#{event[2][1]},#{event[2][2]}\n"
-  end
-
-  if (event[1] == "BUSDEPART") then
-    printf"#{event[0]},#{event[1]},#{event[2][0]},#{event[2][1]},#{event[2][2]}\n"
-  end
-
-  if (event[1] == "BUSSTOP") then
-    printf"#{event[0]},#{event[1]},#{event[2][0]},#{event[2][1]}\n"
-   
-  end
-=begin
-  if (event[1] == "TRANSDATASTATION") then
-    printf"#{event[0]},#{event[1]},#{event[2][1]},#{event[2][2]},#{event[2][3]},#{event[2][4]}\n"
-  end
-  if (event[1] == "RECVDATABUS") then
-    printf"#{event[0]},#{event[1]},#{event[2][1]},#{event[2][2]},#{event[2][3]},#{event[2][4]}\n"
-  end
-=end 
+  printf("%s,%s,%s\n", event[0], event[1], event[2].join(","))
 end
 
-
-
-  
-           
-
-
-#end 
-
-#end
-
-
-
-
- 
-
- 
-
-
- 
-
-  
-
-
+exit
