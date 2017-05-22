@@ -1,6 +1,6 @@
 
 require './objects.rb'
-require 'csv' 
+#require 'csv' 
 
 n=4# Is the number  of events 
 t=0.05
@@ -49,25 +49,25 @@ class Eventlist
   
   # arrival and departure bus events
   
-  def create_BUSARRIVAL(time0,bus_id,stat_id1,stat_id2)# defining   bus movement model with parameterlist
+  def create_BUSARRIVAL(time,bus_id,stat_id)# defining   bus movement model with parameterlist
   		# Creating Events
-  		info = [bus_id,stat_id1,stat_id2]
-  		event = [time0,"BUSARRIVAL", info] # [TIME, EVENT_TYPE, INFORMATION]
+  		info = [bus_id,stat_id]
+  		event = [time,"BUSARRIVAL", info] # [TIME, EVENT_TYPE, INFORMATION]
   		@events.push(event)
   	end
   
   
-  def create_BUSDEPART(time1,bus_id,stati_id1,stati_id2)# defining   bus movement model with parameterlist
+  def create_BUSDEPART(time,bus_id,stati_id)# defining   bus movement model with parameterlist
     # Creating Events
-  	info = [bus_id,stati_id1,stati_id2]
-  	event = [time1,"BUSDEPART", info] # [TIME, EVENT_TYPE, INFORMATION]
+  	info = [bus_id,stati_id]
+  	event = [time,"BUSDEPART", info] # [TIME, EVENT_TYPE, INFORMATION]
   	@events.push(event)
   end 
   
-  def create_BUSSTOP(time1,bus_id,statio_id1)# defining   bus movement model with parameterlist
+  def create_BUSSTOP(time,bus_id,statio_id)# defining   bus movement model with parameterlist
     # Creating Events
-  	info = [bus_id,statio_id1]
-  	event = [time1,"BUSSTOP", info] # [TIME, EVENT_TYPE, INFORMATION]
+  	info = [bus_id,statio_id]
+  	event = [time,"BUSSTOP", info] # [TIME, EVENT_TYPE, INFORMATION]
   	@events.push(event)
   end 
   
@@ -262,30 +262,30 @@ bus2 = Bus.new("bus-002")
 #p list_stations
 
 
-bus1.add_path("station-001", "station-002",60)# station_id 
-bus1.add_stop("station-002",30)# station_id
+bus1.move("station-001", "station-002",60)# station_id 
+bus1.stop("station-002",30)# station_id
 
-bus1.add_path("station-002", "station-003",60)# station_id 
-bus1.add_stop("station-003",30)# station_id
+bus1.move("station-002", "station-003",60)# station_id 
+bus1.stop("station-003",30)# station_id
 
-bus1.add_path("station-003", "station-004",60)# station_id 
-bus1.add_stop("station-004",30)# station_id
+bus1.move("station-003", "station-004",60)# station_id 
+bus1.stop("station-004",30)# station_id
 
-bus1.add_path("station-004", "station-001",60)# station_id 
-bus1.add_stop("station-001",30)# station_id
+bus1.move("station-004", "station-001",60)# station_id 
+bus1.stop("station-001",30)# station_id
 
 
-bus2.add_path("station-003","station-004",60)#
-bus2.add_stop("station-004",30)
+bus2.move("station-003","station-004",60)#
+bus2.stop("station-004",30)
 
-bus2.add_path("station-004","station-001",60)#
-bus2.add_stop("station-001",30)
+bus2.move("station-004","station-001",60)#
+bus2.stop("station-001",30)
 
-bus2.add_path("station-001","station-002",60)#
-bus2.add_stop("station-002",30)
+bus2.move("station-001","station-002",60)#
+bus2.stop("station-002",30)
 
-bus2.add_path("station-002","station-003",60)#
-bus2.add_stop("station-003",30)
+bus2.move("station-002","station-003",60)#
+bus2.stop("station-003",30)
 
 #list_buses=[bus1,bus2]
 
@@ -294,37 +294,30 @@ bus2_path=bus2.get_path()
 
 
 #p bus_path
-current=0
 eventlist.sort()
-eventlist.events.each do |event|
-  #p event
-  end
+#eventlist.events.each do |event|
+#  #p event
+#end
+
 [bus1_path, bus2_path].each do |bus_path|
-  #100.times do |x|
+  current=0
   bus_path.each do |path|
-    
     if (path[0]=='STOP') then
-    	  eventlist.create_BUSSTOP(current,path[1], path[2])
+    	eventlist.create_BUSSTOP(current, path[1], path[2])
         current=path[3]+current
-      end
+    end
    
     if(path[0]=='MOVE') then
+      eventlist.create_BUSDEPART(current, path[1], path[2])
+
       current=path[4]+current
-      eventlist.create_BUSDEPART(current, path[1],path[2], path[3])
-       current=path[4]+current
-      
-      eventlist.create_BUSARRIVAL(current, path[1],path[2], path[3])
-      current=path[4]+current
-      current+=path[4]
+      eventlist.create_BUSARRIVAL(current, path[1], path[3])
      
       end 
     end 
    
   end 
    
-  #end
-#end 
-#end 
   
   
     # Data transmission Event from station To bus within specific data size 
