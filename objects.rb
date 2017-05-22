@@ -1,7 +1,7 @@
 
 
 class Station
-	attr_accessor :id,:bus_id,:station_id
+	attr_accessor :id,:bus_id
 
 	def initialize(id)
 		@id = id
@@ -15,7 +15,9 @@ class Station
 	def get_sensors()
 		return (@list_sensors)
 	end
+
   def get_list_buses()
+    @list_buses=list_buses
   	return (@list_buses)
   end
 	
@@ -33,7 +35,7 @@ class Sensor
 
 	end
 	
-	attr_accessor :id,:station_id,:bus_id
+	attr_accessor :id,:station_id
  
   
 	@datatype # Short-Text(1Kbytes), Text(10Kbytes), Photo(1Mbytes), Video(10Mbytes)
@@ -74,7 +76,7 @@ class Sensor
 
 	def calc_interval()
 #	    interval = 60.0/@datafreq # temporal solution, IMPROVE 
-	    interval =20+Random.rand(60)
+	    interval = rand(60)
 		return (interval)
 	end
 
@@ -82,38 +84,29 @@ end
 #creating bus object 
 
 class Bus
-  
-	attr_accessor :id,:path,:bus_id
-  
-  
+   attr_accessor :id,:path,:bus_id
+
   def initialize(id)
-    @id=id
+    @bus_id=id
     # for buses
     @path = Array.new
-    @bus_id=bus_id
-    
-   
   end
   
   # add path for the bus 
-	def add_path(station_id1, station_id2, minutes)
-		action = ["MOVE", @id, station_id1, station_id2, minutes]
+	def move(station_id1, station_id2, minutes)
+		action = ["MOVE", @bus_id, station_id1, station_id2, minutes]
 		@path.push(action)
 	end
 
-	def add_stop(station_id,minutes)
-		action = ["STOP",@id,station_id,minutes]
+	def stop(station_id,minutes)
+		action = ["STOP", @bus_id, station_id,minutes]
 		@path.push(action)
 	end
-  
-  
 
-  
-  def get_path()
-    return @path
-  end 
-  
-  
+    def get_path()
+      return(@path)
+    end
+
 end
 
 #bus1 = Bus.new("bus1")
