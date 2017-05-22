@@ -1,87 +1,97 @@
+# Object for Simulated Node
 class Node
   def initialize()
-    @count_trans = 0
-    @count_receive = 0
-    
-    @memory = Hash.new
+    @memory = Hash.new # Memory of the node
+	@count_recv = 0 
+	@count_tmit = 0 
   end
 
-  def transmit()
-    @count_trans += 1
+  def store(id_data, size)
+    @memory[id_data] = size
   end
 
-  def receive(id, size)
-    @count_receive += 1
-
-    @memory[id] = size
-  end
-
-  def show_count_transmit()
-    return (@count_trans)
-  end
-
-  def show_count_receive()
-    return (@count_receive)
-  end
-
-  def show_memorysize()
-    total = 0
-    @memory.each do |k, v|
-      total += v
+  def show_memory()
+    mem_total = 0
+    @memory.each_pair do |k,v|
+      mem_total += v
     end
-
-    return(total)
+    return(mem_total)
   end
+
 end
 
-def event_TRANSDATA(node, data)
-  # ["0.0", "TRANSDATA", "Data00000107", "sensor-027", "1024", "station-002"]
-  id_src = data[3]
-  id_dst = data[5]
+
+def process_GENDATA(nodes, data)
+  # Time, EventType, DataId, GeneratorId, Transmitting Size
+  # 178.0,GENDATA,Data00000143,sensor-033,1024,
+
+  # Extract necessary information from Eventlist
   id_data = data[2]
+  id_gene = data[3]
   size = data[4].to_i
 
-  if (node[id_src] == nil) then
-    node[id_src] = Node.new
+  # nodes creation (preparation)
+  if (nodes[id_gene] == nil) then # firstly appeared
+    nodes[id_gene] = Node.new
   end
 
-  node[id_src].transmit()
+  # Simulating for data storing in generation
+  nodes[id_gene].store(id_data, size)
+ 
 end
 
-def event_RECVDATA(node, data)
-  # 1.0,RECVDATA,Data00000130,sensor-033,1024,station-003
-  id_src = data[3]
-  id_dst = data[5]
+def process_RECVDATA(nodes, data)
+  # Time, EventType, DataId, SenderId, Transmitting Size, ReceiverId
+  # 179.0,RECVDATA,Data00000143,sensor-033,1024,station-003
+  # p data
+
+  # Extract necessary information from Eventlist
   id_data = data[2]
+  id_send = data[3]
+  id_recv = data[5]
   size = data[4].to_i
 
-  if (node[id_dst] == nil) then
-    node[id_dst] = Node.new
+  if (nodes[id_send] == nil) then
+    raise # Causing error
+  end
+  # nodes creation (preparation)
+  if (nodes[id_recv] == nil) then # firstly appeared
+    nodes[id_recv] = Node.new
   end
 
-  node[id_dst].receive(id_data, size)
+  # Simulating for data storing at dst (as id_dst)
+  nodes[id_recv].store(id_data, size)
+
 end
 
-node = Hash.new
+def process_BUSARRIVAL(nodes, data)
+end
+
+
+
+# Data preparation
+nodes = Hash.new # Nodes in Simulation
+
+# Main loop for reading Eventlist
 while (line = STDIN.gets) do
-  # ["1.0", "RECVDATA", "Data00000061", "sensor-015", "1024", "station-001"]
   data = line.strip.split(",")
-#  p data
+  p data
 
-  if (data[1] == "TRANSDATA") then
-    event_TRANSDATA(node, data) 
+  if (data[1] == "GENDATA") then
+    process_GENDATA(nodes, data)
   end
+
   if (data[1] == "RECVDATA") then
-    event_RECVDATA(node, data) 
+    process_RECVDATA(nodes, data)
   end
 
+  if (data[1] == "BUSARRIVAL") then
+    process_BUSARRIVAL(nodes, data)
+  end
 end
 
-node.each_pair do |k, v|
-  printf("%s : %d : %d : %d\n",
-    k,
-    v.show_count_transmit,
-    v.show_count_receive,
-    v.show_memorysize)
+# Output
+nodes.each_pair do |k,v|
+  printf("%s : %d\n", k, v.show_memory)
 end
 
