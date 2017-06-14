@@ -12,11 +12,10 @@ lamda=(n/t)*(t/1000)#INTERVAL time of bus at every station
 
 
 def calc_interval(number_events)
-	interval = 60.0/number_events # temporal solution, IMPROVE
+	prng = 60.00/number_events # temporal solution, IMPROVE
 
 	return (interval)
 end
-
 
 class Eventlist
 	attr_accessor :events
@@ -135,7 +134,8 @@ class ArrayObj < Array
 end
 end
 end   
-
+def count_round_trip()
+end 
 
 # Initialization
 SIMULATION_DURATION=860.0
@@ -178,13 +178,13 @@ list_stations.each do |station|
 		while (time < TIME_FINISH) do
 	  		data_id = sprintf("Data%08d", count_data)
 	  		data = sensor.create_data(data_id)
-	  		interval = sensor.calc_interval()
+	  		prng = sensor.calc_interval()
 	  		count_data += 1
 
 			# Creating Events
 			eventlist.create_GENDATA(time, data_id, sensor.id, data.size)
 
-			time += interval
+			time += prng.to_f
 		end
 
 	end
@@ -253,8 +253,12 @@ end
 list_buses = Array.new # for bus instances
 #file=File.new("")
 # creating bus array objects 
+
 bus1 = Bus.new("bus-001")
 bus2 = Bus.new("bus-002")
+bus3 = Bus.new("bus-003")
+car1 = Bus.new("car-001 ")
+car2 = Bus.new("car-002")
 #exit
 
 
@@ -273,7 +277,6 @@ bus1.stop("station-004",30*60)# station_id
 bus1.move("station-004", "station-001",60*60)# station_id 
 bus1.stop("station-001",30*60)# station_id
 
-
 bus2.move("station-003","station-004",60*60)#
 bus2.stop("station-004",30*60)
 
@@ -286,10 +289,56 @@ bus2.stop("station-002",30*60)
 bus2.move("station-002","station-003",60*60)#
 bus2.stop("station-003",30*60)
 
+
+bus3.move("station-004","station-001",60*60)#
+bus3.stop("station-001",30*60)
+
+bus3.move("station-001","station-002",60*60)#
+bus3.stop("station-002",30*60)
+
+bus3.move("station-002","station-003",60*60)#
+bus3.stop("station-003",30*60)
+
+bus3.move("station-003","station-004",60*60)#
+bus3.stop("station-004",30*60)
+
+
+
+
+car1.move("station-004","station-001",60*60)#
+car1.stop("station-001",30*60)
+
+car1.move("station-001","station-002",60*60)#
+car1.stop("station-002",30*60)
+
+car1.move("station-002","station-003",60*60)#
+car1.stop("station-003",30*60)
+
+car1.move("station-003","station-004",60*60)#
+car1.stop("station-004",30*60)
+
+
+
+car2.move("station-004","station-001",60*60)#
+car2.stop("station-001",30*60)
+
+car2.move("station-001","station-002",60*60)#
+car2.stop("station-002",30*60)
+
+car2.move("station-002","station-003",60*60)#
+car2.stop("station-003",30*60)
+
+car2.move("station-003","station-004",60*60)#
+car2.stop("station-004",30*60)
+
 #list_buses=[bus1,bus2]
 
 bus1_path=bus1.get_path()
 bus2_path=bus2.get_path()
+bus3_path=bus3.get_path()
+car1_path=car1.get_path()
+car2_path=car2.get_path()
+
 
 
 #p bus_path
@@ -298,9 +347,13 @@ eventlist.sort()
 #  #p event
 #end
 
-[bus1_path, bus2_path].each do |bus_path|
+[bus1_path, bus2_path,bus3_path,car1_path,car2_path].each do |bus_path|
+
+  
+  #puts "#{bus1_travel_cycle}"
   current=0
   bus_path.each do |path|
+    count= 0 
     if (path[0]=='STOP') then
     	eventlist.create_BUSSTOP(current, path[1], path[2], path[3])
         current=path[3]+current
@@ -317,10 +370,8 @@ eventlist.sort()
    
   end 
    
-  
-    # Data transmission Event from station To bus within specific data size 
-    
-    
+  # Data transmission Event from station To bus within specific data size 
+      
 
 eventlist.sort()
 eventlist.events.each do |event|
