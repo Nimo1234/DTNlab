@@ -60,6 +60,9 @@ def process_GENDATA(nodes, event)
   data = {"id" => id_data, "size" => size, "creationtime" => data_creation, "relaycount" => 0}
 
   nodes[id_gene].put(id_data, data)
+  printf("%d GENERATION %s %d\n",
+    data_creation, id_data, size)
+
 end
 
 def process_TRANSDATA(nodes, event)
@@ -115,10 +118,14 @@ def process_BUSSTOP(nodes, event)
 	copydata_2to1 = ids2 - ids1
 	copydata_1to2 = ids1 - ids2
 
-	printf("%d REPLICATION: %s %d -> %s %d : %d\n",
-		time, node1, tmp1.size, node2, tmp2.size, copydata_1to2.size)
-	printf("%d REPLICATION: %s %d -> %s %d : %d\n",
-		time, node2, tmp2.size, node1, tmp1.size, copydata_2to1.size)
+	printf("%d COPY %s (%d/%d) -> %s (%d+%d=%d)\n",
+		time, node1, copydata_1to2.size, tmp1.size,
+		node2, tmp2.size, copydata_1to2.size, tmp2.size+copydata_1to2.size)
+	printf("%d COPY %s (%d/%d) -> %s (%d+%d=%d)\n",
+		time, node2, copydata_2to1.size, tmp2.size,
+		node1, tmp1.size, copydata_2to1.size, tmp1.size+copydata_2to1.size)
+
+	printf("%d REPLICATION %d\n", time, copydata_1to2.size + copydata_2to1.size)
 
 	copydata_2to1.each do |dataid| # copy node2 to node1
 		data = nodes[node2].get(dataid)
