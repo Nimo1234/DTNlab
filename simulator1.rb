@@ -2,14 +2,10 @@
 require './objects.rb'
 #require 'csv' 
 
-n=4# Is the number  of events 
-t=0.05
-lamda=(n/t)*(t/1000)#INTERVAL time of bus at every station
 
 #Mean Arrival Time = 5 minutes = 5/60th hours
 #Mean Arrival Rate = 60/5 = 12 customers per hour
 #inter_arrival_time = 8/10 # If 10  buses arrive at station  every 8 hours, the time between each arrival is;
-
 
 def calc_interval(number_events)
 	prng = 60.00/number_events # temporal solution, IMPROVE
@@ -123,7 +119,6 @@ class ArrayObject < Array
 	return (elements[0])
 end
 
-
 class ArrayObj < Array
   def getInstances(strId)
     elements = self.select do |elem|
@@ -215,7 +210,7 @@ eventlist.events.each do |event|
 	# [time, "TRANSDATA", [Data-ID, Data-originate-sensor-ID, size, Received ID]]
 	# Creating Events
   #time0=time
-	time0 = event[0]+0.1 # time generated during the data generation 
+	time0 = event[0]+0.5 # time generated during the data generation 
 	eventlist.create_TRANSDATA(time0, data_id, sensor_id, data_size, station_id)
 
 #	time1 = time0+1
@@ -257,6 +252,8 @@ list_buses = Array.new # for bus instances
 bus1 = Bus.new("bus-001")
 bus2 = Bus.new("bus-002")
 bus3 = Bus.new("bus-003")
+bus4 = Bus.new("bus-004")
+bus5 = Bus.new("bus-005")
 car1 = Bus.new("car-001 ")
 car2 = Bus.new("car-002")
 #exit
@@ -265,70 +262,92 @@ car2 = Bus.new("car-002")
 #p list_stations
 
 
-bus1.move("station-001", "station-002",60*60)# station_id 
+bus1.move("station-001", "station-002",120*60)# station_id 
 bus1.stop("station-002",30*60)# station_id
 
-bus1.move("station-002", "station-003",60*60)# station_id 
+bus1.move("station-002", "station-003",120*60)# station_id 
 bus1.stop("station-003",30*60)# station_id
 
-bus1.move("station-003", "station-004",60*60)# station_id 
+bus1.move("station-003", "station-004",120*60)# station_id 
 bus1.stop("station-004",30*60)# station_id
 
-bus1.move("station-004", "station-001",60*60)# station_id 
+bus1.move("station-004", "station-001",120*60)# station_id 
 bus1.stop("station-001",30*60)# station_id
 
-bus2.move("station-003","station-004",60*60)#
+bus2.move("station-003","station-004",120*60)#
 bus2.stop("station-004",30*60)
 
-bus2.move("station-004","station-001",60*60)#
+bus2.move("station-004","station-001",120*60)#
 bus2.stop("station-001",30*60)
 
-bus2.move("station-001","station-002",60*60)#
+bus2.move("station-001","station-002",120*60)#
 bus2.stop("station-002",30*60)
 
-bus2.move("station-002","station-003",60*60)#
+bus2.move("station-002","station-003",120*60)#
 bus2.stop("station-003",30*60)
 
 
-bus3.move("station-004","station-001",60*60)#
+bus3.move("station-004","station-001",120*60)#
 bus3.stop("station-001",30*60)
 
-bus3.move("station-001","station-002",60*60)#
+bus3.move("station-001","station-002",120*60)#
 bus3.stop("station-002",30*60)
 
-bus3.move("station-002","station-003",60*60)#
+bus3.move("station-002","station-003",120*60)#
 bus3.stop("station-003",30*60)
 
-bus3.move("station-003","station-004",60*60)#
+bus3.move("station-003","station-004",120*60)#
 bus3.stop("station-004",30*60)
 
+# add number of Buses 
+bus4.move("station-001", "station-002",120*60)# station_id 
+bus4.stop("station-002",30*60)# station_id
+
+bus4.move("station-002", "station-003",120*60)# station_id 
+bus4.stop("station-003",30*60)# station_id
+
+bus4.move("station-003", "station-004",120*60)# station_id 
+bus4.stop("station-004",30*60)# station_id
+
+bus4.move("station-004", "station-001",120*60)# station_id 
+bus4.stop("station-001",30*60)# station_id
+
+bus5.move("station-003","station-004",120*60)#
+bus5.stop("station-004",30*60)
+
+bus5.move("station-004","station-001",120*60)#
+bus5.stop("station-001",30*60)
+
+bus5.move("station-001","station-002",120*60)#
+bus5.stop("station-002",30*60)
+
+bus5.move("station-002","station-003",120*60)#
+bus5.stop("station-003",30*60)
 
 
-
-car1.move("station-004","station-001",60*60)#
+car1.move("station-004","station-001",120*60)#
 car1.stop("station-001",30*60)
 
-car1.move("station-001","station-002",60*60)#
+car1.move("station-001","station-002",120*60)#
 car1.stop("station-002",30*60)
 
-car1.move("station-002","station-003",60*60)#
+car1.move("station-002","station-003",120*60)#
 car1.stop("station-003",30*60)
 
-car1.move("station-003","station-004",60*60)#
+car1.move("station-003","station-004",120*60)#
 car1.stop("station-004",30*60)
 
 
-
-car2.move("station-004","station-001",60*60)#
+car2.move("station-004","station-001",120*60)#
 car2.stop("station-001",30*60)
 
-car2.move("station-001","station-002",60*60)#
+car2.move("station-001","station-002",120*60)#
 car2.stop("station-002",30*60)
 
 car2.move("station-002","station-003",60*60)#
 car2.stop("station-003",30*60)
 
-car2.move("station-003","station-004",60*60)#
+car2.move("station-003","station-004",120*60)#
 car2.stop("station-004",30*60)
 
 #list_buses=[bus1,bus2]
@@ -336,6 +355,8 @@ car2.stop("station-004",30*60)
 bus1_path=bus1.get_path()
 bus2_path=bus2.get_path()
 bus3_path=bus3.get_path()
+bus4_path=bus4.get_path()
+bus5_path=bus5.get_path()
 car1_path=car1.get_path()
 car2_path=car2.get_path()
 
@@ -347,7 +368,7 @@ eventlist.sort()
 #  #p event
 #end
 
-[bus1_path, bus2_path,bus3_path,car1_path,car2_path].each do |bus_path|
+[bus1_path, bus2_path,bus3_path,bus4_path,bus5_path,car1_path,car2_path].each do |bus_path|
 
   
   #puts "#{bus1_travel_cycle}"
@@ -367,7 +388,6 @@ eventlist.sort()
      
       end 
     end 
-   
   end 
    
   # Data transmission Event from station To bus within specific data size 
